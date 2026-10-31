@@ -26,8 +26,10 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+<BrowserRouter
+  basename={import.meta.env.BASE_URL.replace(/\/$/, "") || "/"}
+>
+  <App />
+</BrowserRouter>
   </StrictMode>,
 );
