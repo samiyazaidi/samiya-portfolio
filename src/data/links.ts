@@ -6,7 +6,7 @@ export interface ProfessionalLink {
 }
 
 export const links = {
-  cv: "/Samiya_Zaidi-FullStack_Developer.pdf" as string | null,
+  cv: `${import.meta.env.BASE_URL}Samiya-Zaidi-CV.pdf` as string | null,
   professional: [
     { id: "github", label: "GitHub", value: "", href: "https://github.com/samiyazaidi" },
     { id: "linkedin", label: "LinkedIn", value: "", href: "https://www.linkedin.com/in/samiyazaidi116" },
