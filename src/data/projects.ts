@@ -293,7 +293,7 @@ export const projects: Project[] = [
   "The mobile app allows customers to explore the salon, discover its services and browse available offers and packages. Its connected admin panel gives the salon a dynamic way to manage the information and offerings displayed in the app, update content and send notifications directly to customers.",
     stack: ["React Native", "Expo EAS", "NestJS", "MongoDB", "Firebase", "Next.js", "Tailwind CSS"],
     preview: "mobile",
-    coverImage: "/projects/mantis-gents-salon.webp",
+    coverImage: "/samiya-portfolio/projects/mantis-gents-salon.webp",
     role: "Mobile app, backend integration, push notifications, and supporting admin panel development.",
    overview:
   "A complete digital solution for an operating gents salon in Abu Dhabi, combining a customer-facing mobile application with a centralized management system. The app keeps customers informed about the salon and its offerings, while the admin panel allows the business to maintain and update its digital presence independently.",
@@ -328,7 +328,7 @@ export const projects: Project[] = [
   "The website presents the company's identity, information and offerings through a polished public-facing experience. Its connected admin panel gives the company control over its website content, allowing the team to make updates and manage its online presence independently without relying on developers for routine changes.",
     stack: ["Next.js", "NestJS", "PostgreSQL", "Prisma", "Tailwind CSS"],
     preview: "energy",
-    coverImage: "/projects/az-energy-studio.webp",
+    coverImage: "/samiya-portfolio/projects/az-energy-studio.webp",
     featured: true,
     role: "Full-stack development across the website, admin experience, API, database, and deployment workflow.",
     overview:
@@ -416,7 +416,7 @@ export const projects: Project[] = [
   "The platform allows users to monitor connected environmental devices, view live readings from weather monitoring systems, flow meters and other equipment, and analyse data through interactive charts. Users can also download reports in PDF and CSV formats. Its reseller system includes customizable dashboards that can be branded and configured before being assigned to individual resellers, while a dedicated Super Admin panel manages users, devices, parameters and their display sequence." ,
     stack: ["React", "Node.js", "Express", "MySQL", "Tailwind CSS"],
     preview: "iot",
-    coverImage: "/projects/iot-dashboard.webp",
+    coverImage: "/samiya-portfolio/projects/iot-dashboard.webp",
     featured: true,
     role: "Main reseller dashboard development, related frontend variants, and delivery workflow.",
     overview:
@@ -458,7 +458,7 @@ export const projects: Project[] = [
   "Chatwave was designed to bring college communication into one dedicated platform. Teachers and students can chat, create groups, share study materials and access relevant student details without having to exchange personal phone numbers or rely on private messaging applications for university communication.",
     stack: ["React", "Next.js", "PostgreSQL"],
     preview: "chatwave",
-    coverImage: "/projects/chatwave.webp",
+    coverImage: "/samiya-portfolio/projects/chatwave.webp",
     role: "Academic project.",
     overview:
   "An internal communication platform designed around the needs of a college community. Chatwave brings teachers and students together in one shared digital environment, making academic communication and resource sharing easier while reducing the need to exchange personal contact numbers or use external private messaging apps.",
