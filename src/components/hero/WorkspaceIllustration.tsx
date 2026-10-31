@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, useMotionValue, useTransform, animate } from 'framer-motion';
 
 /* ------------------------------------------------------------------ *
@@ -908,9 +908,28 @@ function EnvelopeFront({ open }: { open: boolean }) {
   );
 }
 function LetterBack() {
+    const letterBodyRef = useRef<HTMLDivElement>(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  useEffect(() => {
+  const element = letterBodyRef.current;
+  if (!element) return;
+
+  const updateHint = () => {
+    setShowScrollHint(
+      element.scrollHeight - element.clientHeight - element.scrollTop > 8
+    );
+  };
+
+  updateHint();
+
+  const observer = new ResizeObserver(updateHint);
+  observer.observe(element);
+
+  return () => observer.disconnect();
+}, []);
   return (
     <div
-      className="flex h-full w-full flex-col overflow-hidden rounded-[12px] border-2 border-[#e3d7bf] bg-[#fbf6ea] px-5 py-1 text-[#3f3a33] shadow-[0_16px_45px_rgba(11,18,36,0.18)] sm:px-6 sm:py-2"
+      className="flex h-full w-full flex-col overflow-hidden rounded-[12px] border-2 border-[#e3d7bf] bg-[#fbf6ea] px-3 py-2.5 text-[#3f3a33] shadow-[0_16px_45px_rgba(11,18,36,0.18)] sm:px-6 sm:py-2"
       style={{
         fontFamily: "Arial, Helvetica, sans-serif",
       }}
@@ -926,7 +945,19 @@ function LetterBack() {
       {/* <div className="mt-2 h-px shrink-0 bg-[#e3d7bf]" /> */}
 
       {/* Scrollable letter body; scrollbar stays hidden */}
-      <div className="letter-scrollbar-hidden mt-3 min-h-0 flex-1 overflow-y-auto pr-1 text-[12px] leading-[1.65] sm:text-[13px]">
+     <div className="relative mt-3 min-h-0 flex-1">
+
+  <div
+    ref={letterBodyRef}
+    onScroll={(e) => {
+      const el = e.currentTarget;
+      setShowScrollHint(
+        el.scrollHeight - el.clientHeight - el.scrollTop > 8
+      );
+    }}
+    className="letter-scrollbar-hidden h-full min-h-0 overflow-y-auto
+      pr-1 pb-2 text-[12px] leading-[1.65] sm:text-[13px]"
+  >
         <p className="mb-3 text-[13px] font-semibold sm:text-[14px]">
           Hello there,
         
@@ -957,11 +988,7 @@ function LetterBack() {
         <p className="font-medium text-[#6f4650]">
           Here's to good people and lovely things ahead.
         </p>
-      </div>
-
-      {/* Signature stays visible while the body scrolls */}
-      <div className="mt-3 flex shrink-0 items-end justify-between  pt-3">
-        <div>
+        <div className="mt-1 flex  items-end justify-between  pt-1"></div>
           <p className="text-[11px] text-[#7c6b5e]">Warmly,</p>
           <p
             className="mt-0.5 text-[25px] leading-none text-[#142f4d]"
@@ -969,13 +996,50 @@ function LetterBack() {
           >
             Samiya Zaidi
           </p>
-        </div>
-
-        {/* <span className="flex size-9 items-center justify-center rounded-full border border-[#d9c8aa] text-[10px] font-semibold tracking-wider text-[#6f4650]">
-          SZ
-        </span> */}
       </div>
+     
+
+     {/* Scroll indicator */}
+  {showScrollHint && (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center pb-1">
+
+      <div className="absolute inset-x-0 bottom-0 h-8
+        bg-gradient-to-t from-[#fbf6ea] via-[#fbf6ea]/90 to-transparent"
+      />
+
+      <button
+        type="button"
+        aria-label="Scroll down to read more"
+        onClick={() => {
+          letterBodyRef.current?.scrollBy({
+            top: letterBodyRef.current.clientHeight * 0.7,
+            behavior: "smooth",
+          });
+        }}
+        className="pointer-events-auto relative flex items-center gap-2
+          rounded-full border border-[#dfd0b8]/80
+          bg-[#fbf6ea]/95 px-3 py-1
+          text-[10px] tracking-wide text-[#80675b]
+          shadow-sm transition-all hover:bg-white"
+      >
+        More to read
+
+        <svg
+          className="size-3 animate-bounce"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </button>
     </div>
+  )}
+</div>
+</div>
   );
 }
 
@@ -1015,6 +1079,15 @@ export  function WorkspaceIllustration() {
   const skyPhase = useSkyPhase();
   const skyPalette = SKY_PALETTES[skyPhase];
 
+
+  const [isCompactViewport, setIsCompactViewport] = useState(
+  () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 1023px)").matches
+);
+
+
+
   /* ------------------------------ derived state ------------------------------ */
 
   // The lamp is the "working" switch: she only sits down while it is on.
@@ -1025,6 +1098,23 @@ export  function WorkspaceIllustration() {
   const wantBirdInside = curtainsOpen;
   // Light ink reads on the dim room, dark ink on the bright room.
   const hintInk = lightsOn ? '#6f4650' : '#f3e5c8';
+
+
+
+
+
+  useEffect(() => {
+  const media = window.matchMedia("(max-width: 1023px)");
+
+  const updateViewport = () => {
+    setIsCompactViewport(media.matches);
+  };
+
+  updateViewport();
+  media.addEventListener("change", updateViewport);
+
+  return () => media.removeEventListener("change", updateViewport);
+}, []);
 
   /* ------------------------------ bird state machine ------------------------- */
 
@@ -1118,7 +1208,7 @@ export  function WorkspaceIllustration() {
   /* ---------------------------------- render --------------------------------- */
 
   return (
-    <div className="relative aspect-[3/2] w-[min(100%,150dvh)] overflow-hidden rounded-xl sm:rounded-3xl">
+    <div className="relative aspect-[3/2] w-[min(100%,150dvh)] overflow-hidden rounded-xl sm:rounded-3xl"  style={{ containerType: "size" }}>
       <svg
         viewBox="0 0 1200 800"
         preserveAspectRatio="xMidYMid meet"
@@ -2396,7 +2486,8 @@ export  function WorkspaceIllustration() {
   {drawerOpen && (
     <motion.div
       key="gift"
-      className="absolute inset-0 z-20"
+      className="absolute inset-0 z-20 overflow-y-auto overscroll-contain"
+      style={{ scrollbarWidth: "none" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -2411,12 +2502,12 @@ export  function WorkspaceIllustration() {
       />
 
       {/* Envelope stays inside the illustration */}
-      <div className="absolute left-1/2 top-[56%] z-10 -translate-x-1/2 -translate-y-1/2">
-        <div className="relative aspect-[3/2] w-[min(88vw,420px)]">
+      <div className="absolute inset-0 z-10 grid place-items-center p-3 sm:p-6">
+        <div className="relative block aspect-[3/2] w-[88%] max-w-[420px] cursor-pointer rounded-[12px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffd79a] shrink-0">
           {/* Letter slides up out of the envelope */}
           <motion.div
-            className="absolute right-[5%] bottom-0 left-[5%] z-20"
-            style={{ height: "min(350px, 46vh)",   pointerEvents: letterFlipped ? "auto" : "none", }}
+            className="absolute right-[5%] bottom-[-80px] left-[5%] z-20"
+            style={{ height: "min(350px, 80cqh)",   pointerEvents: letterFlipped ? "auto" : "none", }}
             initial={{
               y: 90,
               opacity: 0,
