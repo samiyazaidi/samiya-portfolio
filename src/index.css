@@ -1,0 +1,144 @@
+
+/* =========================================================
+   1. FONT IMPORTS
+========================================================= */
+
+@import "@fontsource-variable/dm-sans/wght.css";
+@import "@fontsource/cormorant-garamond/latin-400.css";
+@import "@fontsource/cormorant-garamond/latin-500.css";
+@import "@fontsource/cormorant-garamond/latin-600.css";
+@import "@fontsource/cormorant-garamond/latin-400-italic.css";
+@import "@fontsource/cormorant-garamond/latin-500-italic.css";
+@import "@fontsource/cormorant-garamond/latin-600-italic.css";
+
+@import "tailwindcss" source("./");
+
+
+/* =========================================================
+   2. THEME CONFIGURATION
+========================================================= */
+
+@theme {
+  /* Brand colors */
+  --color-primary: #e9eef2;
+  --color-secondary: #b1cce1;
+  --color-tertiary: #022340;
+
+  /* Accent colors */
+  --color-accent: #779ab6;
+  --color-accent-strong: #002444;
+  --color-accent-soft: #113652;
+
+  /* Dark theme colors */
+  --color-dark-primary: #061628;
+  --color-dark-secondary: #1a3b5f;
+  --color-dark-tertiary: #215f81;
+
+  /* Text colors */
+  --color-text-primary: #002444;
+  --color-text-secondary: #022340;
+  --color-text-tertiary: #aabbc9;
+
+  /* On-dark text */
+  --color-on-dark: #dad3e3;
+  --color-on-dark-muted: #EBD5D5;
+
+  /* Surface and borders */
+  --color-surface: #FFFCFA;
+  --color-border: #E5C9C6;
+  --color-on-accent: #FFFFFF;
+
+  /* Typography */
+  --font-sans: "DM Sans Variable", sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+}
+
+
+/* =========================================================
+   3. GLOBAL BASE STYLES
+========================================================= */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    /* Smooth page navigation */
+    @apply scroll-smooth;
+
+    scroll-padding-top: 0;
+
+    /* Hide the main page scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  body {
+    @apply m-0 bg-primary font-sans text-text-primary antialiased;
+
+    /* Hide the main page scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  /* Navigation sections start at the viewport top */
+  section[id] {
+    scroll-margin-top: 0;
+  }
+
+  /* Interactive element focus styles */
+  button,
+  a,
+  input,
+  textarea {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-strong;
+  }
+
+  /* Pointer cursor */
+  button:not(:disabled),
+  a {
+    @apply cursor-pointer;
+  }
+
+  /* Text selection */
+  ::selection {
+    @apply bg-tertiary text-text-primary;
+  }
+
+  /* Respect reduced-motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+
+/* =========================================================
+   4. HIDE MAIN PAGE SCROLLBAR
+========================================================= */
+
+/* Chrome, Edge, Safari */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+
+/* =========================================================
+   5. LETTER SCROLLBAR
+========================================================= */
+
+.letter-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.letter-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

@@ -1,0 +1,32 @@
+CHANGES IN THIS VERSION
+
+- Preserved src/components/hero/HeroSection.tsx unchanged.
+- Kept the curved header line and made its thin blush curve more visible.
+- Kept Quick Links and made Download CV visible in the header; the CV button
+  uses /cv.pdf until a real file/path is supplied. Quick Links falls back to
+  useful section links while external destinations are empty.
+- Reordered the page to: Hero, What I Do + About Me, Projects, Skills,
+  Experience + Education + Contact, Footer.
+- Integrated “Built to work. Built to last.” as an editorial pull line rather
+  than a standalone card, alongside the dark “More Than Just Code” panel.
+- Added four compact capability tiles for web, mobile, backend/API, and
+  database/deployment work.
+- Made the five project cards lighter and more compact. Carousel controls are
+  above the rail, cards support drag/scroll, and a top-right project link icon
+  appears only when a valid HTTPS link is supplied. Code/Demo buttons are gone.
+- Changed the skills area into a compact horizontal rail of real technology
+  icons and names.
+- Rebuilt the bottom area with dotted work/education timelines and a wider
+  contact form with name, email, subject, and message fields.
+- Added optional Formspree submission via VITE_FORMSPREE_ENDPOINT, with a
+  mailto fallback when an email destination is configured in src/data/links.ts.
+- Kept theme names semantic/generic in src/index.css and retained the light
+  blush/rose foundation with two deep red tones.
+- Added the approved visual reference under docs/ for comparison only.
+
+BUILD NOTE
+TypeScript/TSX syntax parsing and relative-import checks completed without
+syntax or missing-import diagnostics. A full npm typecheck/build could not be
+completed because the npm registry was unreachable in the editing environment;
+run npm ci, npm run typecheck, npm run build, and npm test where registry access
+is available before deployment.

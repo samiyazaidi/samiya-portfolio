@@ -1,0 +1,5 @@
+Verification record for this project update:
+- HeroSection.tsx was not modified; its source checksum matches the base project.
+- TypeScript/TSX syntax parsing completed across 51 source files with no syntax diagnostics.
+- A full `npm run typecheck` / `npm run build` could not be completed here because the npm registry was unreachable (EAI_AGAIN) and the cached React type packages were empty. Run `npm ci`, `npm run typecheck`, and `npm run build` locally before deployment.
+- Contact form supports VITE_FORMSPREE_ENDPOINT or a mailto fallback when an email destination is configured.

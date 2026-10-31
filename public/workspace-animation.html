@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>After Hours — Interactive Workspace</title>
+<style>
+  :root{color-scheme:dark;--navy:#061628;--navy2:#10263b;--wine:#511725;--burgundy:#79283d;--red:#a84f5d;--rose:#c87983;--blush:#e4b0aa;--ivory:#fff7ef;--cream:#f4e7da;}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 10%,#3e2930 0,#17131b 55%,#080d15 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ivory)}
+  .frame{width:min(1280px,100%);}
+  .topline{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:0 0 12px;padding:0 4px;color:#dbc2b9;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+  .topline .note{letter-spacing:.03em;text-transform:none;color:#bfa8a5;font-size:12px}
+  .scene{position:relative;width:100%;aspect-ratio:5/3;overflow:hidden;border-radius:22px;background:#271f29;box-shadow:0 36px 90px #0008,0 0 0 1px #b87b8130;isolation:isolate}
+  svg{width:100%;height:100%;display:block}
+  .hit{position:absolute;z-index:10;border:0;background:transparent;cursor:pointer;border-radius:18px;padding:0;outline-offset:4px}
+  .hit:focus-visible{outline:2px solid #ffe6d5;box-shadow:0 0 0 5px #a84f5d88}
+  .lamp-hit{left:61%;top:0;width:14%;height:25%}
+  .curtain-hit{left:5%;top:5%;width:37%;height:51%}
+  .prompt{pointer-events:none;user-select:none}
+  #lamp-prompt, #curtain-prompt{transition:opacity .3s ease}
+  #lamp-prompt .hint-arrow,#curtain-prompt .hint-arrow{animation:hint 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes hint{0%,100%{opacity:.64;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+  #lamp-glow,#desk-light,#wall-light,#window-light{transition:opacity .9s ease}
+  #curtains-left,#curtains-right{transition:transform 1.15s cubic-bezier(.2,.75,.18,1)}
+  #curtains-left.open{transform:translateX(-235px)}
+  #curtains-right.open{transform:translateX(235px)}
+  #character-sit,#character-walk,#character-exit{opacity:0;pointer-events:none}
+  #character-walk.entering{opacity:1;animation:walkIn 1.75s cubic-bezier(.2,.7,.25,1) forwards}
+  #character-walk.leaving{opacity:1;animation:walkOut 1.5s cubic-bezier(.5,0,.8,.3) forwards}
+  #character-sit.visible{opacity:1;transition:opacity .45s ease}
+  #character-sit.hiding{opacity:0;transition:opacity .24s ease}
+  @keyframes walkIn{0%{transform:translateX(-420px);opacity:0}12%{opacity:1}74%{transform:translateX(10px)}86%{transform:translateX(-7px)}100%{transform:translateX(0);opacity:1}}
+  @keyframes walkOut{0%{transform:translateX(0);opacity:1}12%{transform:translateX(6px);opacity:1}100%{transform:translateX(-670px);opacity:0}}
+  #character-walk .swing{transform-box:fill-box;transform-origin:top center;animation:legSwing .34s ease-in-out infinite alternate}
+  #character-walk .swing.reverse{animation-delay:-.34s}
+  #character-walk.entering .bob{animation:bob .34s ease-in-out infinite alternate}
+  @keyframes legSwing{from{transform:rotate(-13deg)}to{transform:rotate(13deg)}}
+  @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+  #bird{opacity:0;transform:translate(220px,-155px);transform-box:fill-box;transform-origin:center}
+  #bird.flying-in{opacity:1;animation:birdIn 1.6s cubic-bezier(.22,.65,.25,1) forwards}
+  #bird.perched{opacity:1;transform:translate(0,0);transition:transform .35s ease}
+  #bird.flying-out{opacity:1;animation:birdOut 1.1s ease-in forwards}
+  @keyframes birdIn{0%{transform:translate(220px,-155px) scale(.7);opacity:0}18%{opacity:1}70%{transform:translate(-12px,12px) scale(1.04)}100%{transform:translate(0,0) scale(1);opacity:1}}
+  @keyframes birdOut{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(235px,-175px) scale(.72);opacity:0}}
+  #bird .wing{transform-box:fill-box;transform-origin:center;animation:wing 0.22s ease-in-out infinite alternate}
+  @keyframes wing{from{transform:rotate(-22deg)}to{transform:rotate(25deg)}}
+  #bird.perched .wing{animation:none;transform:rotate(0)}
+  @keyframes floatZ{0%,100%{transform:translateY(0);opacity:.65}50%{transform:translateY(-7px);opacity:1}}
+  .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .control{display:flex;align-items:center;gap:8px;background:#21161f;border:1px solid #9d697455;color:#f9e9e0;border-radius:999px;padding:10px 15px;font-size:12px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+  .control:hover{background:#46232e;border-color:#c87983;transform:translateY(-1px)}
+  .control[aria-pressed="true"]{background:#5e2134;border-color:#d38d96}
+  .control:focus-visible{outline:2px solid #fff0d7;outline-offset:3px}
+  .control .dot{width:8px;height:8px;border-radius:50%;background:#8f6066;box-shadow:0 0 0 3px #8f606622}
+  .control[aria-pressed="true"] .dot{background:#ffdca0;box-shadow:0 0 10px #ffdca0}
+  .state-line{text-align:center;color:#bda7a5;font-size:11px;margin:10px 0 0;min-height:16px}
+  @media(max-width:700px){body{padding:10px}.topline{font-size:10px}.topline .note{display:none}.scene{border-radius:12px}.controls{gap:6px}.control{padding:8px 11px;font-size:11px}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="topline"><span>AFTER HOURS · INTERACTIVE WORKSPACE</span><span class="note">Turn on the lamp · open the curtains</span></div>
+  <main class="scene" id="scene" aria-label="Interactive portfolio workspace">
+    <svg viewBox="0 0 1200 720" role="img" aria-labelledby="title desc" preserveAspectRatio="xMidYMid meet">
+      <title id="title">A quiet navy and burgundy workspace</title>
+      <desc id="desc">An empty office at night. Click the pendant lamp to have a hijabi developer walk in and sit at the desk. Open the curtains to reveal daylight and invite a little bird to perch on the desk.</desc>
+      <defs>
+        <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#493034"/><stop offset=".6" stop-color="#30212a"/><stop offset="1" stop-color="#70444a"/></linearGradient>
+        <linearGradient id="windowGlass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f8dcb7"/><stop offset="1" stop-color="#aa7d84"/></linearGradient>
+        <linearGradient id="curtain" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#020b16"/><stop offset=".5" stop-color="#061628"/><stop offset=".78" stop-color="#14283b"/><stop offset="1" stop-color="#061628"/></linearGradient>
+        <linearGradient id="deskTop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#10263b"/><stop offset="1" stop-color="#061628"/></linearGradient>
+        <linearGradient id="hijab" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d48d92"/><stop offset=".46" stop-color="#a84f5d"/><stop offset="1" stop-color="#672337"/></linearGradient>
+        <linearGradient id="hijabLight" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eab8b2"/><stop offset="1" stop-color="#b96873"/></linearGradient>
+        <linearGradient id="sweater" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffaf2"/><stop offset="1" stop-color="#ddc7b7"/></linearGradient>
+        <linearGradient id="chair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e3cbb8"/><stop offset="1" stop-color="#9c786f"/></linearGradient>
+        <linearGradient id="lampShade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#963d50"/><stop offset="1" stop-color="#401523"/></linearGradient>
+        <radialGradient id="lampGlow"><stop stop-color="#fff1be" stop-opacity=".98"/><stop offset=".32" stop-color="#ffd58b" stop-opacity=".52"/><stop offset="1" stop-color="#ffd58b" stop-opacity="0"/></radialGradient>
+        <radialGradient id="dayGlow"><stop stop-color="#fff0cf" stop-opacity=".9"/><stop offset="1" stop-color="#fff0cf" stop-opacity="0"/></radialGradient>
+        <pattern id="wallGrain" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1" cy="2" r=".35" fill="#f9d7cd" opacity=".18"/></pattern>
+        <clipPath id="roomClip"><rect width="1200" height="720" rx="24"/></clipPath>
+      </defs>
+      <g clip-path="url(#roomClip)">
+        <rect width="1200" height="720" fill="url(#wall)"/>
+        <rect width="1200" height="720" fill="url(#wallGrain)"/>
+        <path d="M0 560Q280 528 620 548T1200 530V720H0Z" fill="#221b23"/>
+        <!-- left shelf and books -->
+        <path d="M0 145H154V160H0Z" fill="#21191f"/><path d="M0 139H154V148H0Z" fill="#82444b"/>
+        <rect x="22" y="49" width="20" height="89" rx="2" fill="#642b39"/><rect x="48" y="37" width="23" height="101" rx="2" fill="#9c4d59"/><rect x="77" y="69" width="18" height="69" rx="2" fill="#c87983"/>
+        <!-- climbing vine -->
+        <path d="M117 37Q145 76 120 115T139 177T112 230" fill="none" stroke="#88524a" stroke-width="3"/>
+        <g fill="#813d43"><ellipse cx="114" cy="65" rx="8" ry="16" transform="rotate(-30 114 65)"/><ellipse cx="135" cy="88" rx="8" ry="16" transform="rotate(28 135 88)"/><ellipse cx="113" cy="113" rx="8" ry="16" transform="rotate(-25 113 113)"/><ellipse cx="134" cy="139" rx="8" ry="16" transform="rotate(25 134 139)"/><ellipse cx="115" cy="164" rx="8" ry="16" transform="rotate(-24 115 164)"/><ellipse cx="130" cy="189" rx="8" ry="16" transform="rotate(24 130 189)"/><ellipse cx="113" cy="213" rx="8" ry="16" transform="rotate(-24 113 213)"/></g>
+        <!-- arched window -->
+        <path d="M130 390V185A175 175 0 0 1 480 185V390Z" fill="#211a22" stroke="#855356" stroke-width="8"/>
+        <path d="M143 378V185A162 162 0 0 1 467 185V378Z" fill="url(#windowGlass)"/>
+        <circle cx="305" cy="157" r="43" fill="#ffe8bf" opacity=".68"/>
+        <path d="M143 317Q201 249 251 291T467 278V378H143Z" fill="#c6a3a0" opacity=".55"/>
+        <path d="M305 60V378M143 226H467" stroke="#b78c82" stroke-width="5" fill="none"/>
+        <!-- curtains, completely meeting at the center when shut -->
+        <path d="M88 43H509" stroke="#24191f" stroke-width="8" stroke-linecap="round"/><path d="M91 39H508" stroke="#a77c71" stroke-width="2" stroke-linecap="round"/>
+        <g id="curtains-left">
+          <path d="M78 49Q202 72 313 48L322 378Q200 396 92 378Z" fill="url(#curtain)" stroke="#27374b" stroke-width="2"/>
+          <path d="M111 56Q145 207 130 381M158 55Q190 211 178 388M212 52Q238 209 233 391M267 51Q290 210 284 389" stroke="#293d52" stroke-width="5" fill="none" opacity=".9"/>
+          <path d="M96 60Q115 204 102 367" stroke="#768193" stroke-width="2" fill="none" opacity=".32"/>
+          <g fill="#8c6e68"><circle cx="100" cy="48" r="4"/><circle cx="135" cy="50" r="4"/><circle cx="170" cy="51" r="4"/><circle cx="205" cy="51" r="4"/><circle cx="240" cy="50" r="4"/><circle cx="275" cy="50" r="4"/></g>
+        </g>
+        <g id="curtains-right">
+          <path d="M290 48Q401 70 520 48L509 380Q397 398 300 378Z" fill="url(#curtain)" stroke="#27374b" stroke-width="2"/>
+          <path d="M315 50Q340 211 334 392M365 52Q394 214 386 393M418 52Q444 213 438 387M470 50Q492 207 487 381" stroke="#293d52" stroke-width="5" fill="none" opacity=".9"/>
+          <path d="M509 60Q521 201 501 368" stroke="#768193" stroke-width="2" fill="none" opacity=".32"/>
+          <g fill="#8c6e68"><circle cx="312" cy="50" r="4"/><circle cx="347" cy="51" r="4"/><circle cx="382" cy="51" r="4"/><circle cx="417" cy="50" r="4"/><circle cx="452" cy="50" r="4"/><circle cx="487" cy="49" r="4"/></g>
+        </g>
+        <!-- wall decor -->
+        <g transform="rotate(-5 557 173)"><rect x="536" y="138" width="47" height="66" rx="2" fill="#f2dfd1"/><circle cx="559" cy="142" r="3" fill="#a84f5d"/><path d="M545 158H574M545 168H570M545 178H574M545 188H566" stroke="#b57e79" stroke-width="2" stroke-linecap="round"/></g>
+        <g transform="rotate(5 594 235)"><rect x="578" y="210" width="42" height="47" rx="2" fill="#e9c9bd"/><path d="M596 230c-7-10 1-13 3-3 9-12 17-4 3 4l-3 9" fill="none" stroke="#95505a" stroke-width="2"/></g>
+        <rect x="1046" y="60" width="112" height="182" rx="2" fill="#25181e" stroke="#9b5d60" stroke-width="5"/><rect x="1057" y="71" width="90" height="160" fill="#ead7c7"/>
+        <path d="M1076 208Q1101 169 1104 118M1104 158Q1127 139 1128 118M1103 147Q1081 136 1085 117M1104 185Q1126 173 1134 157" stroke="#a36a6a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- left plant -->
+        <path d="M86 413V313M86 350Q46 325 48 294Q78 301 86 350M88 333Q130 300 128 274Q99 286 88 333M85 381Q45 371 38 344Q66 347 85 381" fill="none" stroke="#944c50" stroke-width="3"/>
+        <path d="M48 294Q78 301 86 350Q56 329 48 294M128 274Q99 286 88 333Q119 302 128 274M38 344Q66 347 85 381Q48 372 38 344" fill="#a34e58"/>
+        <path d="M44 403H126L118 433H51Z" fill="#d9b9a7"/><path d="M44 403H126" stroke="#a64e5a" stroke-width="3"/>
+        <!-- right plant -->
+        <path d="M1103 436V322M1105 365Q1066 343 1068 313Q1095 321 1105 365M1106 340Q1147 313 1144 286Q1119 298 1106 340M1103 405Q1062 392 1058 371Q1086 372 1103 405M1108 384Q1144 368 1152 348Q1125 354 1108 384" fill="none" stroke="#944c50" stroke-width="3"/>
+        <path d="M1068 313Q1095 321 1105 365Q1074 345 1068 313M1144 286Q1119 298 1106 340Q1138 315 1144 286M1058 371Q1086 372 1103 405Q1065 396 1058 371M1152 348Q1125 354 1108 384Q1142 370 1152 348" fill="#a34e58"/>
+        <path d="M1065 421H1143L1137 452H1072Z" fill="#d9b9a7"/>
+        <!-- desk and drawers -->
+        <path d="M104 468L94 676H126L147 468M1010 468L1031 676H1063L1042 468" fill="#030b16"/>
+        <path d="M50 445Q597 415 1162 445L1149 496Q598 513 58 493Z" fill="#020a14"/>
+        <path d="M50 445Q597 415 1162 445L1159 465Q600 486 55 465Z" fill="url(#deskTop)" stroke="#34485a" stroke-width="2"/>
+        <path d="M70 451Q597 428 1133 451" stroke="#68788a" stroke-width="2" fill="none" opacity=".72"/>
+        <path d="M58 493Q595 510 1149 496V667H58Z" fill="#071729"/>
+        <path d="M93 526H361V604H93Z" fill="#091b2e" stroke="#21384f" stroke-width="2"/><path d="M387 526H650V604H387Z" fill="#091b2e" stroke="#21384f" stroke-width="2"/>
+        <circle cx="228" cy="565" r="7" fill="#a36e65"/><circle cx="517" cy="565" r="7" fill="#a36e65"/>
+        <!-- framed books at left -->
+        <path d="M66 430H204L214 444H70Z" fill="#a84f5d"/><path d="M61 414H197L208 430H66Z" fill="#f0dccb"/><path d="M71 400H190L199 414H61Z" fill="#7d303f"/><path d="M76 405H177M69 421H189M76 435H204" stroke="#ebc6b5" stroke-width="1.5" opacity=".65"/>
+        <!-- chair behind seated figure -->
+        <path d="M526 463Q550 411 614 426L697 456Q722 473 729 514L739 667H505L509 514Z" fill="url(#chair)" stroke="#a78578" stroke-width="3"/>
+        <path d="M548 484Q612 458 704 491" stroke="#f1dfd1" stroke-width="4" fill="none"/>
+        <!-- burgundy scarf over chair -->
+        <path d="M669 465Q687 458 705 471L718 644Q701 661 680 641Z" fill="#772a3c"/><path d="M683 479L699 635M699 486L708 634" stroke="#a95460" stroke-width="2" fill="none"/>
+        <!-- desk objects behind hands -->
+        <path d="M270 425H313L307 466H275Z" fill="#35252a"/><path d="M280 425L272 381M292 425L298 365M304 425L318 390" stroke="#d6b09c" stroke-width="4" stroke-linecap="round"/>
+        <!-- laptop -->
+        <path d="M286 326Q286 315 300 315H458Q470 315 472 327L486 439H304Z" fill="#101721" stroke="#7c7472" stroke-width="3"/><rect x="300" y="329" width="157" height="92" rx="2" fill="#091522"/>
+        <g stroke-linecap="round" stroke-width="2"><path d="M313 342H326M333 342H365" stroke="#c87983"/><path d="M313 353H343M350 353H381" stroke="#e4b0aa"/><path d="M313 364H330M337 364H374M381 364H393" stroke="#af5962"/><path d="M313 375H345M352 375H384" stroke="#e4b0aa"/><path d="M313 386H333M340 386H366M373 386H405" stroke="#c87983"/><path d="M313 397H350M358 397H380" stroke="#af5962"/><path d="M313 408H333M340 408H374M381 408H397" stroke="#e4b0aa"/></g>
+        <path d="M304 439H486L498 450H293Z" fill="#c0b5ab"/><path d="M348 443H432" stroke="#756d6b" stroke-width="2" stroke-linecap="round"/>
+        <!-- fixed body and sleeves, visible only when she enters -->
+        <g id="character-sit">
+          <!-- body -->
+          <path d="M403 349Q428 320 469 326Q509 330 537 361L562 448H369L374 391Z" fill="url(#sweater)" stroke="#e5d3c3" stroke-width="1.5"/>
+          <path d="M408 363Q382 375 359 404L376 428Q406 415 430 387Z" fill="url(#sweater)" stroke="#e5d3c3" stroke-width="1.5"/>
+          <path d="M490 362Q522 371 541 400L533 424Q509 410 482 385Z" fill="url(#sweater)" stroke="#e5d3c3" stroke-width="1.5"/>
+          <!-- hands resting on keyboard -->
+          <path d="M367 414Q384 402 407 411L436 421Q445 427 435 434L408 430L382 434Q369 433 367 424Z" fill="#ead0c0" stroke="#d3b9a8" stroke-width="1"/>
+          <path d="M485 411Q505 405 522 418L537 429Q542 435 533 439L510 431L491 430Q483 425 485 411Z" fill="#f0d9c9" stroke="#d3b9a8" stroke-width="1"/>
+          <!-- long, clearly fabric-like hijab drape -->
+          <path d="M414 318C397 294 406 257 432 237C456 218 489 226 508 249C528 276 521 307 498 328C491 341 504 360 522 381C540 402 542 425 527 444C507 437 489 420 476 402C461 382 448 363 431 347C420 336 416 327 414 318Z" fill="url(#hijab)" stroke="#71313e" stroke-width="2"/>
+          <path d="M414 318C396 291 406 256 432 237C456 218 489 226 508 249C528 276 521 307 498 328C477 346 452 350 433 336C422 328 417 323 414 318Z" fill="url(#hijabLight)" stroke="#914551" stroke-width="1.5"/>
+          <path d="M423 257C442 248 454 231 461 226M421 273C444 261 466 239 474 229M424 291C450 276 476 255 484 240M433 307C459 292 489 272 498 253" stroke="#e6a4a5" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M439 236C426 254 430 277 445 293M460 228C447 248 451 267 465 282M483 236C470 254 475 269 487 278" stroke="#924653" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <path d="M445 327C433 347 428 364 441 384C454 404 469 421 468 440C486 431 500 413 503 392C505 373 491 355 478 341L463 321Z" fill="#9b4354" stroke="#71313e" stroke-width="1.5"/>
+          <path d="M456 344C446 366 463 387 477 405C487 418 485 433 475 441M469 346C464 365 479 382 491 399" stroke="#d7878d" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+        <!-- Coffee cup on right -->
+        <g id="coffee-cup">
+          <ellipse cx="795" cy="451" rx="40" ry="7" fill="#01070f" opacity=".62"/>
+          <path d="M766 395H824V433Q795 451 767 433Z" fill="#fff7ef" stroke="#d9c0af" stroke-width="2"/>
+          <ellipse cx="795" cy="395" rx="29" ry="7" fill="#ead8c8"/><ellipse cx="795" cy="395" rx="23" ry="4" fill="#55322b"/>
+          <path d="M824 404Q855 395 851 420Q846 437 824 432" fill="none" stroke="#fff7ef" stroke-width="8"/><path d="M824 406Q843 402 841 420Q839 429 824 427" fill="none" stroke="#c4a997" stroke-width="2"/>
+          <path d="M795 412C786 402 778 413 795 426C811 413 803 402 795 412Z" fill="#a84f5d"/>
+          <g id="steam" fill="none" stroke="#e8c8b8" stroke-width="2" stroke-linecap="round"><path d="M778 383Q769 373 778 364T778 346"/><path d="M797 383Q789 371 797 363T797 344"/><path d="M815 383Q807 373 815 365"/></g>
+        </g>
+        <!-- Right books and pen pot -->
+        <path d="M876 427H1028L1037 440H879Z" fill="#a94f5d"/><path d="M871 412H1023L1031 427H876Z" fill="#e6c8b8"/><path d="M879 395H1018L1026 412H871Z" fill="#7d303f"/>
+        <text x="949" y="407" text-anchor="middle" font-size="10" fill="#fff0e2" font-family="Georgia,serif">IDEAS</text>
+        <path d="M889 375H922L919 412H892Z" fill="#35252a"/><path d="M895 375L889 340M905 375L910 332M915 375L926 349" stroke="#d6b09c" stroke-width="4" stroke-linecap="round"/>
+        <!-- bird, hidden until curtains open -->
+        <g transform="translate(836 406)">
+        <g id="bird" aria-label="A little bird flying in to perch on the desk">
+          <path d="M0 0Q-17 -13 -31 -5Q-22 7 -5 8Q-12 20 -26 22Q-6 29 9 12Q24 9 27 -6Q15 -15 0 0Z" fill="#c87983" stroke="#71313e" stroke-width="1.5"/>
+          <path class="wing" d="M-5 2Q-19 -21 -22 -6Q-20 4 -5 8Z" fill="#f0b2ad" stroke="#9b4d59" stroke-width="1.5"/>
+          <circle cx="15" cy="-5" r="2.5" fill="#281923"/><path d="M26 -5L34 -2L26 0Z" fill="#d8bba8"/>
+          <path d="M-1 11L-5 17M6 12L5 18" stroke="#d8bba8" stroke-width="2" stroke-linecap="round"/>
+        </g>
+        </g>
+        <!-- Overall night overlay; prompt UI is rendered after it -->
+        <rect id="night-overlay" width="1200" height="720" fill="#020914" opacity=".68" pointer-events="none"/>
+        <!-- light pools sit above the dimming layer -->
+        <ellipse id="window-light" cx="315" cy="310" rx="330" ry="295" fill="url(#dayGlow)" opacity="0" pointer-events="none" style="mix-blend-mode:screen"/>
+        <path id="wall-light" d="M800 147L650 473Q797 520 985 469L853 147Z" fill="url(#lampGlow)" opacity="0" pointer-events="none" style="mix-blend-mode:screen"/>
+        <ellipse id="desk-light" cx="719" cy="429" rx="330" ry="210" fill="url(#lampGlow)" opacity="0" pointer-events="none" style="mix-blend-mode:screen"/>
+        <!-- lamp hanging from ceiling -->
+        <path d="M800 0V97" stroke="#1b1118" stroke-width="5"/><path d="M755 113Q762 75 800 72Q838 75 845 113Q800 140 755 113Z" fill="url(#lampShade)" stroke="#29161d" stroke-width="2"/><path d="M757 113Q800 130 843 113" fill="none" stroke="#ac6169" stroke-width="3"/>
+        <circle id="bulb" cx="800" cy="125" r="11" fill="#69434a"/><circle id="bulbHalo" cx="800" cy="125" r="23" fill="#ffe9ae" opacity="0"/>
+        <!-- prompts -->
+        <g id="curtain-prompt" class="prompt">
+          <path class="hint-arrow" d="M160 170H432M173 158L160 170L173 182M419 158L432 170L419 182" stroke="#f4dcce" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="hint-arrow" d="M297 126V148M286 138L297 149L308 138" stroke="#fff0df" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="296" y="214" text-anchor="middle" font-family="Georgia,serif" font-size="25" fill="#fff7ef">Open the <tspan fill="#c87983" font-style="italic">curtains</tspan></text>
+          <text x="296" y="246" text-anchor="middle" font-family="Georgia,serif" font-size="21" fill="#f4e7da">to let in some daylight</text>
+          <circle cx="448" cy="245" r="13" fill="#ef9f73"/><path d="M448 225V220M448 270V265M428 245H423M473 245H468M434 231L430 227M462 259L466 263M462 231L466 227M434 259L430 263" stroke="#ef9f73" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+        <g id="lamp-prompt" class="prompt">
+          <path class="hint-arrow" d="M874 193Q906 165 947 151M930 150L947 151L943 168" stroke="#f4dcce" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M941 133L946 146L959 151L946 156L941 169L936 156L923 151L936 146Z" fill="#ca7781"/>
+          <text id="lamp-copy-1" x="1007" y="263" text-anchor="middle" font-family="Georgia,serif" font-size="27" fill="#fff7ef">Switch on</text>
+          <text id="lamp-copy-2" x="1007" y="307" text-anchor="middle" font-family="Georgia,serif" font-size="38" font-style="italic" fill="#df8d96">the lights</text>
+          <text id="lamp-copy-3" x="1007" y="344" text-anchor="middle" font-family="Georgia,serif" font-size="20" fill="#f4dfd5">to start working…</text>
+          <path d="M952 378L956 387L965 391L956 395L952 404L948 395L939 391L948 387Z" fill="#e6b5ad"/>
+        </g>
+      </g>
+    </svg>
+    <button class="hit lamp-hit" id="lamp-hit" aria-label="Switch on the lights to start working" title="Switch the lamp on or off" aria-pressed="false"></button>
+    <button class="hit curtain-hit" id="curtain-hit" aria-label="Open the curtains to let in daylight" title="Open or close the curtains" aria-pressed="false"></button>
+  </main>
+  <div class="controls">
+    <button class="control" id="lamp-control" aria-pressed="false"><span class="dot"></span><span id="lamp-control-text">Switch on lights</span></button>
+    <button class="control" id="curtain-control" aria-pressed="false"><span class="dot"></span><span id="curtain-control-text">Open curtains</span></button>
+    <button class="control" id="reset-control"><span aria-hidden="true">↺</span> Reset scene</button>
+  </div>
+  <p class="state-line" id="state-line" role="status" aria-live="polite">It’s quiet after hours. Switch on the lamp to begin.</p>
+</div>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const left = $('curtains-left'), right = $('curtains-right');
+  const bird = $('bird'), night = $('night-overlay');
+  const character = $('character-sit');
+  const walking = document.createElementNS('http://www.w3.org/2000/svg','g');
+  walking.setAttribute('id','character-walk');
+  walking.innerHTML = `
+    <g class="bob">
+      <path d="M402 349Q428 320 469 326Q509 330 537 361L562 448H369L374 391Z" fill="url(#sweater)" stroke="#e5d3c3" stroke-width="1.5"/>
+      <path d="M414 318C397 294 406 257 432 237C456 218 489 226 508 249C528 276 521 307 498 328C491 341 504 360 522 381C540 402 542 425 527 444C507 437 489 420 476 402C461 382 448 363 431 347C420 336 416 327 414 318Z" fill="url(#hijab)" stroke="#71313e" stroke-width="2"/>
+      <path d="M414 318C396 291 406 256 432 237C456 218 489 226 508 249C528 276 521 307 498 328C477 346 452 350 433 336C422 328 417 323 414 318Z" fill="url(#hijabLight)" stroke="#914551" stroke-width="1.5"/>
+      <path d="M423 257C442 248 454 231 461 226M421 273C444 261 466 239 474 229M424 291C450 276 476 255 484 240" stroke="#e6a4a5" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M404 426Q423 438 442 430L456 485L432 486L410 449Z" fill="#f4e7da" stroke="#d8bba8" stroke-width="2"/>
+      <path class="swing" d="M455 438Q468 452 470 478L463 526H442L446 477Z" fill="#f4e7da" stroke="#d8bba8" stroke-width="2"/>
+      <path class="swing reverse" d="M477 438Q490 452 496 477L508 523H487L471 481Z" fill="#e5d0c0" stroke="#d8bba8" stroke-width="2"/>
+      <path d="M441 526H465M487 523H511" stroke="#3a232a" stroke-width="9" stroke-linecap="round"/>
+    </g>`;
+  // Walking pose sits in the same scene layer, behind desk foreground objects.
+  const svg = document.querySelector('svg');
+  svg.insertBefore(walking, $('coffee-cup'));
+  let lampOn = false, curtainsOpen = false, womanPresent = false, transitioning = false;
+  let exitTimer = null, enterTimer = null, birdTimer = null;
+
+  function setLampVisual(on) {
+    lampOn = on;
+    $('lamp-hit').setAttribute('aria-pressed', String(on));
+    $('lamp-hit').setAttribute('aria-label', on ? 'Switch off the lights' : 'Switch on the lights to start working');
+    $('lamp-control').setAttribute('aria-pressed', String(on));
+    $('lamp-control-text').textContent = on ? 'Switch off lights' : 'Switch on lights';
+    $('bulb').setAttribute('fill', on ? '#fff5d4' : '#69434a');
+    $('bulbHalo').style.opacity = on ? '.65' : '0';
+    $('wall-light').style.opacity = on ? '.86' : '0';
+    $('desk-light').style.opacity = on ? '.8' : '0';
+    const darkness = on ? (curtainsOpen ? '.02' : '.17') : (curtainsOpen ? '.39' : '.68');
+    night.style.opacity = darkness;
+    $('lamp-copy-1').textContent = on ? 'All done?' : 'Switch on';
+    $('lamp-copy-2').textContent = on ? 'time to rest' : 'the lights';
+    $('lamp-copy-3').textContent = on ? 'switch off to call it a day…' : 'to start working…';
+    $('lamp-prompt').style.opacity = on ? '.98' : '1';
+  }
+
+  function setCurtainsVisual(open) {
+    curtainsOpen = open;
+    left.classList.toggle('open', open);
+    right.classList.toggle('open', open);
+    $('curtain-hit').setAttribute('aria-pressed', String(open));
+    $('curtain-hit').setAttribute('aria-label', open ? 'Close the curtains' : 'Open the curtains to let in daylight');
+    $('curtain-control').setAttribute('aria-pressed', String(open));
+    $('curtain-control-text').textContent = open ? 'Close curtains' : 'Open curtains';
+    $('window-light').style.opacity = open ? (lampOn ? '.4' : '.95') : '0';
+    night.style.opacity = lampOn ? (open ? '.02' : '.17') : (open ? '.39' : '.68');
+    $('state-line').textContent = open ? 'Daylight is coming in. A little visitor is on its way.' : (lampOn ? 'The room is lit and ready for work.' : 'It’s quiet after hours. Switch on the lamp to begin.');
+    if (open) flyBirdIn(); else flyBirdOut();
+  }
+
+  function flyBirdIn() {
+    clearTimeout(birdTimer);
+    bird.classList.remove('flying-out','perched','flying-in');
+    // Restart the flight animation so each opening is discoverable.
+    void bird.getBoundingClientRect();
+    bird.classList.add('flying-in');
+    birdTimer = setTimeout(() => {
+      if (curtainsOpen) {
+        bird.classList.remove('flying-in');
+        bird.classList.add('perched');
+      }
+    }, 1650);
+  }
+
+  function flyBirdOut() {
+    clearTimeout(birdTimer);
+    if (!bird.classList.contains('perched') && !bird.classList.contains('flying-in')) return;
+    bird.classList.remove('perched','flying-in');
+    void bird.getBoundingClientRect();
+    bird.classList.add('flying-out');
+    birdTimer = setTimeout(() => bird.classList.remove('flying-out'), 1150);
+  }
+
+  function characterEnter() {
+    clearTimeout(exitTimer); clearTimeout(enterTimer);
+    transitioning = true; womanPresent = true;
+    character.classList.remove('visible','hiding');
+    walking.classList.remove('leaving','entering');
+    void walking.getBoundingClientRect();
+    walking.classList.add('entering');
+    $('state-line').textContent = 'She’s taking her seat. The workspace is waking up.';
+    enterTimer = setTimeout(() => {
+      walking.classList.remove('entering');
+      walking.style.opacity = '0';
+      character.classList.add('visible');
+      transitioning = false;
+      $('state-line').textContent = 'Lights on. Time to build something meaningful.';
+    }, 1760);
+  }
+
+  function characterExit() {
+    clearTimeout(enterTimer); clearTimeout(exitTimer);
+    if (!womanPresent) return;
+    transitioning = true;
+    character.classList.remove('visible');
+    character.classList.add('hiding');
+    walking.style.opacity = '1';
+    walking.classList.remove('entering','leaving');
+    void walking.getBoundingClientRect();
+    walking.classList.add('leaving');
+    $('state-line').textContent = 'Wrapping up. She’s heading out for the night.';
+    exitTimer = setTimeout(() => {
+      walking.classList.remove('leaving');
+      walking.style.opacity = '0';
+      character.classList.remove('hiding');
+      womanPresent = false; transitioning = false;
+      $('state-line').textContent = curtainsOpen ? 'The room is quiet, with daylight at the window and a bird on the desk.' : 'The room is empty again. Switch on the lamp whenever you’re ready.';
+    }, 1510);
+  }
+
+  function toggleCurtains() {
+    if (!curtainsOpen) {
+      setCurtainsVisual(true);
+      return;
+    }
+    // Let the bird fly back out through the open window before closing the panels.
+    flyBirdOut();
+    window.setTimeout(() => setCurtainsVisual(false), 950);
+  }
+
+  function toggleLamp() {
+    if (transitioning) return;
+    if (!lampOn) {
+      setLampVisual(true);
+      characterEnter();
+    } else {
+      // Begin the character's exit while the light is still on; then darken the room.
+      if (womanPresent) {
+        transitioning = true;
+        character.classList.remove('visible');
+        character.classList.add('hiding');
+        walking.style.opacity = '1';
+        walking.classList.remove('entering','leaving');
+        void walking.getBoundingClientRect();
+        walking.classList.add('leaving');
+        $('state-line').textContent = 'She’s finishing up and leaving the workspace.';
+        exitTimer = setTimeout(() => {
+          walking.classList.remove('leaving');
+          walking.style.opacity = '0';
+          character.classList.remove('hiding');
+          womanPresent = false; transitioning = false;
+          setLampVisual(false);
+          $('state-line').textContent = curtainsOpen ? 'The room is dark and quiet, with daylight at the window.' : 'The room is empty again. Switch on the lamp whenever you’re ready.';
+        }, 1510);
+      } else {
+        setLampVisual(false);
+      }
+    }
+  }
+
+  function resetScene() {
+    clearTimeout(exitTimer); clearTimeout(enterTimer); clearTimeout(birdTimer);
+    lampOn = false; curtainsOpen = false; womanPresent = false; transitioning = false;
+    character.classList.remove('visible','hiding');
+    walking.classList.remove('entering','leaving'); walking.style.opacity = '0';
+    bird.classList.remove('flying-in','flying-out','perched'); bird.style.opacity = '0';
+    setCurtainsVisual(false); setLampVisual(false);
+    $('state-line').textContent = 'It’s quiet after hours. Switch on the lamp to begin.';
+  }
+
+  $('lamp-hit').addEventListener('click', toggleLamp);
+  $('lamp-control').addEventListener('click', toggleLamp);
+  $('curtain-hit').addEventListener('click', toggleCurtains);
+  $('curtain-control').addEventListener('click', toggleCurtains);
+  $('reset-control').addEventListener('click', resetScene);
+  resetScene();
+})();
+</script>
+</body>
+</html>

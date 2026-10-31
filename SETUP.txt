@@ -1,0 +1,76 @@
+Samiya — EDITORIAL DEVELOPER PORTFOLIO
+
+PROJECT
+React + TypeScript + Vite application using Tailwind CSS v4, Framer Motion,
+Lucide React, and React Icons. Cormorant Garamond and DM Sans are loaded via
+Fontsource. The contact form supports a configurable Formspree endpoint, with
+a mailto fallback if an email address is configured in the links data.
+
+DEVELOP LOCALLY
+Use Node.js 22.12 or newer. Extract the archive, then run:
+  npm ci
+  npm run dev
+Open the local URL printed by Vite.
+
+CHECK AND BUILD
+  npm run typecheck
+  npm run build
+  npm test
+  npm run preview
+The production build is written to dist/ after npm run build. Playwright smoke tests
+are defined in `tests/portfolio.spec.ts` and use `playwright.config.ts`.
+
+LAYOUT ORDER
+The approved visual reference is saved at `docs/approved-layout-reference.png`.
+It is a reference only and is not rendered as an image on the live page.
+
+1. The original hero section remains unchanged.
+2. What I Do and About Me sit side by side, with “Built to work. Built to last.”
+   integrated as an editorial line rather than another standalone card.
+3. Selected Projects use compact cards, optional top-right external-link icons,
+   horizontal drag/swipe, and arrows placed above the carousel.
+4. Skills are actual technology badges in a compact horizontal rail.
+5. Work experience and education use vertical dotted timelines alongside a
+   wider contact form panel.
+6. Footer is the final section.
+
+THEME
+All interface colours are defined in src/index.css using generic semantic
+names: primary, secondary, tertiary, accent, accent-strong, accent-soft,
+dark-primary, dark-secondary, text-primary, text-secondary, surface, border,
+on-dark, and on-dark-muted. Components use these tokens rather than named
+colour swatches. The palette is primarily light blush/cream with two deep red
+shades for dark sections and important contrast.
+
+CONTENT AND LINKS
+- src/data/portfolio.ts: display identity, intro, About copy, and navigation.
+  The scaffold uses Samiya as a name placeholder.
+- src/data/projects.ts: project titles, summaries, technology tags, and optional
+  link/screenshot fields. Setting a valid HTTPS URL in `link` adds a small
+  clickable icon in the top-right of that project's preview.
+- src/data/skills.ts: actual technology names and icons.
+- src/data/experience.ts and src/data/education.ts: timeline content. Empty
+  dates/descriptions are intentionally omitted from the visible page.
+- src/data/links.ts: CV, GitHub, LinkedIn, email, and phone destinations. To keep
+  the header CV button visible, add your CV at `public/cv.pdf`, or set `links.cv`
+  to another valid URL/path. Configure real social destinations when ready.
+- src/data/services.ts: the four capability cards.
+
+CONTACT FORM
+For direct form submissions from the website, copy `.env.example` to `.env`
+and set `VITE_FORMSPREE_ENDPOINT` to the endpoint from your Formspree form.
+That service will deliver messages to the inbox configured there. Restart Vite
+or rebuild after changing environment variables. If no endpoint is set but an
+email address is configured in `src/data/links.ts`, the form prepares a message
+in the visitor's email application instead. A pure static site cannot securely
+send email to an inbox without a form service or backend.
+
+MOTION AND ACCESSIBILITY
+The single robot mascot, workspace illustration, reversible desk lamp,
+reduced-motion preference, keyboard support, and horizontal carousels remain.
+The hero component itself was not changed for this layout update. Use the skip
+link and visible focus styles when extending sections.
+
+PUBLISHING
+Run `npm run build`, then deploy the resulting `dist/` contents to a static host.
+No external deployment has been made from this environment.

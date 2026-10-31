@@ -1,0 +1,8 @@
+Dependencies are identified with exact versions in package-lock.json.
+React, React DOM, Vite, TypeScript, Tailwind CSS, Framer Motion, Lucide React,
+and React Icons retain their respective upstream licenses. Technology marks
+are their owners' trademarks and do not imply employment or endorsement.
+Bundled Cormorant Garamond and DM Sans are distributed under the SIL Open
+Font License; full notices are in public/assets/font-licenses/.
+The workspace and coding robot are original editable SVG source components.
+No stock photos or employer logos have been inserted.
