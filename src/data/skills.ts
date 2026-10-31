@@ -40,7 +40,6 @@ import {
   FiGitBranch,
   FiCloud,
   FiPenTool,
-  FiMonitor,
   FiCheckCircle,
 } from "react-icons/fi";
 

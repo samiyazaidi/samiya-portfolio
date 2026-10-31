@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronUp, LayoutGrid, Mail, Phone, X } from "lucide-react";
+import {  ChevronUp, LayoutGrid, Mail, Phone, X } from "lucide-react";
 import { SiGithub as Github } from "react-icons/si";
 import { FaLinkedinIn as Linkedin } from "react-icons/fa6";
 import { links } from "../../data/links";
