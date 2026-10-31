@@ -37,7 +37,7 @@ export function CVButton({
 }) {
   const configuredDestination = safeDestination(links.cv, true);
   if (!configuredDestination && !alwaysShow) return null;
-  const destination = configuredDestination ?? "/Samiya_Zaidi-FullStack_Developer.pdf";
+  const destination = configuredDestination ?? `${import.meta.env.BASE_URL}Samiya-Zaidi-CV.pdf`;
   const classes = `${buttonClass} ${compact ? "min-h-10 px-3 py-2 text-[11px] sm:px-4" : ""} ${light ? "border border-on-dark/35 text-on-dark hover:bg-on-dark/10 focus-visible:outline-on-dark" : "border border-accent/50 bg-surface text-dark-primary hover:bg-secondary"}`;
 
   return (

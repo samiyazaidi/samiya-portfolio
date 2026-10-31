@@ -1374,25 +1374,36 @@ export  function WorkspaceIllustration() {
             {/* <path d="M 108,244 C 122,264 128,292 126,322" /> */}
             {/* <path d="M 92,246 C 84,272 84,300 92,326" /> */}
           </g>
-          {[
-            [78, 172],
-            [126, 172],
-            [128],
-            [127],
-            [90],
-            [92],
-            [110, 204],
-          ].map(([x, y], i) => (
-            <ellipse
-              key={i}
-              cx={x}
-              cy={y}
-              rx={8}
-              ry={5}
-              fill={i % 2 === 0 ? C.plant : C.plantLight}
-              transform={`rotate(${i % 2 === 0 ? -50 : 40} ${x} ${y})`}
-            />
-          ))}
+         {[
+        { x: 78, y: 172 },
+        { x: 126, y: 172 },
+        { x: 128, y: 278 },
+        { x: 127, y: 308 },
+        { x: 90, y: 276 },
+        { x: 92, y: 312 },
+        { x: 110, y: 204 },
+      ].map((leaf, i) => {
+        const rotation = i % 2 === 0 ? -50 : 40;
+
+        if (
+          !Number.isFinite(leaf.x) ||
+          !Number.isFinite(leaf.y)
+        ) {
+          return null;
+        }
+
+        return (
+          <ellipse
+            key={i}
+            cx={leaf.x}
+            cy={leaf.y}
+            rx={8}
+            ry={5}
+            fill={i % 2 === 0 ? C.plant : C.plantLight}
+            transform={`rotate(${rotation} ${leaf.x} ${leaf.y})`}
+          />
+        );
+      })}
           <rect x={148} y={218} width={30} height={22} rx={4} fill="#e9d9b6" />
           <rect x={152} y={214} width={22} height={6} rx={3} fill="#d9c9a4" />
 
