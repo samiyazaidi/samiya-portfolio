@@ -279,6 +279,10 @@ const AZ_ENERGY_URL = "https://azenergystudio.com/";
 const MANTIS_APP_URL = "https://apps.apple.com/iq/app/mantis-gents-salon/id6761405280";
 const DRIVE_HUB_URL = "https://thedrivehub.com/";
 const DRIVE_HUB_APP_URL = "https://apps.apple.com/iq/iphone/search?term=thedrivehub";
+const NOOR_AL_FIKR_URL = "https://nooralfikr.com/";
+const CME_URL = "https://cme.qa/";
+const CALIBRIX_URL =
+  "https://dashboard.enggenv.com/calib_cert/#/login";
 
 export const projects: Project[] = [
  
@@ -486,7 +490,133 @@ export const projects: Project[] = [
       "Teachers can access relevant details about their students within the same platform, bringing communication and student-related information into one environment."
   }
 ]
-  }
+  },
+  
+{
+  id: "noor-al-fikr",
+  slug: "noor-al-fikr-website",
+  title: "Noor Al Fikr Website",
+  category: "COMPANY WEBSITE · SAUDI ARABIA",
+  description:
+    "A responsive company website for a Saudi-based environmental solutions provider, showcasing its products, monitoring solutions and services through modern design and seamless navigation.",
+  expandedDescription:
+    "The website presents Noor Al Fikr's company profile, environmental monitoring products, engineering services and industry solutions. It also features integrated chat functionality, providing visitors with a convenient way to connect with the company.",
+  stack: ["React"],
+  preview: "energy",
+  coverImage: pageThumbnail(NOOR_AL_FIKR_URL),
+  role: "Frontend development, responsive UI implementation and chat integration.",
+  overview:
+    "A modern digital presence for Noor Al Fikr, bringing together its company information, environmental monitoring solutions, products and services in an accessible and responsive website.",
+  links: [
+    {
+      label: "Visit Noor Al Fikr",
+      kind: "website",
+      href: NOOR_AL_FIKR_URL
+    }
+  ],
+  screenshots: [],
+  sections: [
+    {
+      title: "Company profile and solutions",
+      body:
+        "Presents the company's expertise in environmental monitoring, including air, water and weather monitoring equipment and connected solutions."
+    },
+    {
+      title: "Products and services",
+      body:
+        "Showcases its monitoring products, engineering services, turnkey solutions, technical support and system integration capabilities."
+    },
+    {
+      title: "Integrated chat experience",
+      body:
+        "Includes chat functionality to make it easier for website visitors to connect and communicate with the company."
+    }
+  ]
+},
+{
+  id: "cme-website",
+  slug: "cme-website",
+  title: "CME Website",
+  category: "COMPANY WEBSITE · QATAR",
+  description:
+    "A responsive website for a Qatar-based engineering and energy services company, featuring modern design, GSAP-powered animations and seamless navigation.",
+  expandedDescription:
+    "The website brings together CME's company profile, engineering capabilities, subsea and EPCI expertise, maintenance services and project experience through an engaging digital experience.",
+  stack: ["React", "GSAP"],
+  preview: "energy",
+  coverImage: pageThumbnail(CME_URL),
+  role: "Frontend development, responsive UI and GSAP animation implementation.",
+  overview:
+    "A modern company website designed to showcase CME's engineering, trading and energy services, highlighting its industry expertise, capabilities, achievements and commitment to delivering reliable engineering solutions.",
+  links: [
+    {
+      label: "Visit CME Website",
+      kind: "website",
+      href: CME_URL
+    }
+  ],
+  screenshots: [],
+  sections: [
+    {
+      title: "Company profile and services",
+      body:
+        "Presents CME's engineering and energy services, including comprehensive engineering solutions, subsea and EPCI expertise, and maintenance and technical support."
+    },
+    {
+      title: "Projects and capabilities",
+      body:
+        "Highlights the company's industry experience, engineering expertise, project achievements and work across offshore and onshore energy infrastructure."
+    },
+    {
+      title: "Interactive user experience",
+      body:
+        "Features responsive layouts, smooth GSAP animations and intuitive navigation to create an engaging browsing experience."
+    }
+  ]
+},
+{
+  id: "calibrix",
+  slug: "calibrix-certificate-generation",
+  title: "Calibrix – Certificate Generation System",
+  category: "WEB APPLICATION",
+  description:
+    "A web-based certificate generation system that allows users to create personalized certificates with custom details and designs.",
+  expandedDescription:
+    "Calibrix provides a flexible certificate generation solution, allowing users to customize certificate details and generate professionally designed PDF certificates.",
+  stack: ["React", "Express", "MySQL", "React-to-PDF"],
+  preview: "iot",
+  coverImage: pageThumbnail(CALIBRIX_URL),
+  role: "Full-stack development, backend integration and PDF generation.",
+  overview:
+    "A certificate generation web application designed to simplify the creation of customized certificates. It combines a responsive React frontend with an Express backend and MySQL database, supporting personalized certificate creation and PDF output.",
+  links: [
+    {
+      label: "Open Calibrix",
+      kind: "demo",
+      href: CALIBRIX_URL
+    }
+  ],
+  screenshots: [],
+  sections: [
+    {
+      title: "Custom certificate generation",
+      body:
+        "Allows users to generate certificates with personalized information and customized designs based on individual requirements."
+    },
+    {
+      title: "PDF generation",
+      body:
+        "Uses React-to-PDF to convert certificate designs into downloadable PDF documents."
+    },
+    {
+      title: "Full-stack implementation",
+      body:
+        "Built with React, Express and MySQL, providing an integrated frontend, backend and database solution."
+    }
+  ]
+}
+
+  
 ];
 
 export function getProjectBySlug(slug: string | undefined): Project | undefined {
