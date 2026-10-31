@@ -1080,14 +1080,6 @@ export  function WorkspaceIllustration() {
   const skyPalette = SKY_PALETTES[skyPhase];
 
 
-  const [isCompactViewport, setIsCompactViewport] = useState(
-  () =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(max-width: 1023px)").matches
-);
-
-
-
   /* ------------------------------ derived state ------------------------------ */
 
   // The lamp is the "working" switch: she only sits down while it is on.
@@ -1098,23 +1090,6 @@ export  function WorkspaceIllustration() {
   const wantBirdInside = curtainsOpen;
   // Light ink reads on the dim room, dark ink on the bright room.
   const hintInk = lightsOn ? '#6f4650' : '#f3e5c8';
-
-
-
-
-
-  useEffect(() => {
-  const media = window.matchMedia("(max-width: 1023px)");
-
-  const updateViewport = () => {
-    setIsCompactViewport(media.matches);
-  };
-
-  updateViewport();
-  media.addEventListener("change", updateViewport);
-
-  return () => media.removeEventListener("change", updateViewport);
-}, []);
 
   /* ------------------------------ bird state machine ------------------------- */
 
