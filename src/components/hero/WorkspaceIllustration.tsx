@@ -1078,6 +1078,7 @@ export  function WorkspaceIllustration() {
   const [focused, setFocused] = useState<FocusTarget>(null);
   const skyPhase = useSkyPhase();
   const skyPalette = SKY_PALETTES[skyPhase];
+  const envelopeAreaRef = useRef<HTMLDivElement>(null);
 
 
   /* ------------------------------ derived state ------------------------------ */
@@ -1158,6 +1159,29 @@ export  function WorkspaceIllustration() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [drawerOpen]);
+
+  // Close drawer when clicking outside envelope and letter
+useEffect(() => {
+  if (!drawerOpen) return;
+
+  const handleOutsideClick = (event: PointerEvent) => {
+    const envelopeArea = envelopeAreaRef.current;
+    const target = event.target;
+
+    if (target instanceof Node && envelopeArea?.contains(target)) {
+      return;
+    }
+
+    setLetterFlipped(false);
+    setDrawerOpen(false);
+  };
+
+  document.addEventListener("pointerdown", handleOutsideClick, true);
+
+  return () => {
+    document.removeEventListener("pointerdown", handleOutsideClick, true);
+  };
+}, [drawerOpen]);
 
   const closeGift = () => {
     setLetterFlipped(false);
@@ -2467,6 +2491,7 @@ export  function WorkspaceIllustration() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35 }}
+      
     >
       {/* Click outside to close */}
       <button
@@ -2478,7 +2503,7 @@ export  function WorkspaceIllustration() {
 
       {/* Envelope stays inside the illustration */}
       <div className="absolute inset-0 z-10 grid place-items-center p-3 sm:p-6">
-        <div className="relative block aspect-[3/2] w-[88%] max-w-[420px] cursor-pointer rounded-[12px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffd79a] shrink-0">
+        <div ref={envelopeAreaRef} className="relative block aspect-[3/2] w-[88%] max-w-[420px] cursor-pointer rounded-[12px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ffd79a] shrink-0">
           {/* Letter slides up out of the envelope */}
           <motion.div
             className="absolute right-[5%] bottom-[-80px] left-[5%] z-20"
